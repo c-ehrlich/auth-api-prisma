@@ -2,6 +2,9 @@ export default {
   port: 3000,
   dbUri: 'mongodb://localhost:27017/crud-boilerplate-express-ts',
   logLevel: 'info',
+  // defined in custom-environment-variables.ts
+  accessTokenPrivateKey: '',
+  refreshTokenPrivateKey: '',
   smtp: {
     // in production, use a proper smtp server and set secure to true
     user: 'ggz4rlsxo2yrinxn@ethereal.email',
@@ -9,5 +12,5 @@ export default {
     host: 'smtp.ethereal.email',
     port: 587,
     secure: false,
-  }
+  },
 };
