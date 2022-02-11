@@ -1,7 +1,13 @@
 import { Request, Response } from 'express';
+import { get } from 'lodash';
 import { createSessionInput } from '../schema/auth.schema';
-import { signAccessToken, signRefreshToken } from '../service/auth.service';
-import { findUserByEmail } from '../service/user.service';
+import {
+  findSessionById,
+  signAccessToken,
+  signRefreshToken,
+} from '../service/auth.service';
+import { findUserByEmail, findUserById } from '../service/user.service';
+import { verifyJwt } from '../utils/jwt';
 // if you integrate another auth strategy such as oauth, this controller would handle all that logic
 
 export async function createSessionHandler(
@@ -42,4 +48,34 @@ export async function createSessionHandler(
     accessToken,
     refreshToken,
   });
+}
+
+export async function refreshAccessTokenHandler(req: Request, res: Response) {
+  // this needs to actually be in our headers that are sent in the frontend
+  // check postman for a sample
+  const refreshToken = get(req, 'headers.x-refresh');
+  const decoded = verifyJwt<{ session: string }>(
+    refreshToken,
+    'refreshTokenPublicKey'
+  );
+
+  if (!decoded) {
+    return res.status(401).send('Could not refresh access token');
+  }
+
+  const session = await findSessionById(decoded.session);
+
+  if (!session || !session.valid) {
+    return res.status(401).send('Could not refresh access token');
+  }
+
+  const user = await findUserById(String(session.user));
+
+  if (!user) {
+    return res.status(401).send('Could not refresh access token');
+  }
+
+  const accessToken = signAccessToken(user);
+
+  return res.send({ accessToken })
 }

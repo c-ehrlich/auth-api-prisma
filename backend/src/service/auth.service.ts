@@ -8,6 +8,10 @@ export async function createSession({ userId }: { userId: string }) {
   return SessionModel.create({ user: userId });
 }
 
+export async function findSessionById(id: string) {
+  return SessionModel.findById(id);
+}
+
 export function signAccessToken(user: DocumentType<User>) {
   const payload = omit(user.toJSON(), privateFields);
   const accessToken = signJwt(payload, 'accessTokenPrivateKey', {
