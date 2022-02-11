@@ -7,6 +7,11 @@ import log from './utils/logger';
 import router from './routes';
 
 const app = express();
+
+// in the past we would have used body-parser for this
+app.use(express.json());
+
+// router needs to be below any 'use' statements that are used inthe routes
 app.use(router);
 
 const port = config.get('port');
