@@ -5,11 +5,14 @@ import connectToDb from './utils/connectToDb';
 import log from './utils/logger';
 
 import router from './routes';
+import deserializeUser from './middleware/deserializeUser';
 
 const app = express();
 
 // in the past we would have used body-parser for this
 app.use(express.json());
+
+app.use(deserializeUser);
 
 // router needs to be below any 'use' statements that are used inthe routes
 app.use(router);
