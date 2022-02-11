@@ -10,7 +10,9 @@ export async function createSession({ userId }: { userId: string }) {
 
 export function signAccessToken(user: DocumentType<User>) {
   const payload = omit(user.toJSON(), privateFields);
-  const accessToken = signJwt(payload, 'accessTokenPrivateKey');
+  const accessToken = signJwt(payload, 'accessTokenPrivateKey', {
+    expiresIn: '15m',
+  });
   return accessToken;
 }
 
@@ -23,7 +25,10 @@ export async function signRefreshToken({ userId }: { userId: string }) {
   // sign a refresh token
   const refreshToken = signJwt(
     { session: session._id },
-    'refreshTokenPrivateKey'
+    'refreshTokenPrivateKey',
+    {
+      expiresIn: '1y',
+    }
   );
   return refreshToken;
 }
