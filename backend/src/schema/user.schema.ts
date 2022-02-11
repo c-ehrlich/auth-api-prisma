@@ -19,9 +19,18 @@ export const createUserSchema = object({
     }).email('Not a valid email'),
   }).refine((data) => data.password === data.passwordConfirmation, {
     message: 'Passwords do not match',
-    path: ["passwordConfirmation"],
+    path: ['passwordConfirmation'],
+  }),
+});
+
+export const verifyUserSchema = object({
+  params: object({
+    // params appear inside the url
+    id: string(),
+    verificationCode: string(),
   }),
 });
 
 // export a TS interface from the above schema
 export type CreateUserInput = TypeOf<typeof createUserSchema>['body'];
+export type VerifyUserInput = TypeOf<typeof verifyUserSchema>['params'];
