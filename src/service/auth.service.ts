@@ -1,7 +1,7 @@
-import { DocumentType } from '@typegoose/typegoose';
 import { signJwt } from '../utils/jwt';
 import { omit } from 'lodash';
 import prisma from '../utils/prisma';
+import { User } from '@prisma/client';
 
 const privateFields = [
   'password',
@@ -15,14 +15,14 @@ export async function createSession({ userId }: { userId: string }) {
 }
 
 export async function findSessionById(id: string) {
-  const session = prisma.session.findUnique({ where: { id } });
+  const session = prisma.session.findUnique({ where: { id } , include: { User: true }});
 
   return session;
 }
 
 // FIXME-TS type of user was DocumentType<User>
-export function signAccessToken(user: any) {
-  const payload = omit(user.toJSON(), privateFields);
+export function signAccessToken(user: User) {
+  const payload = omit(user, privateFields);
   const accessToken = signJwt(payload, 'accessTokenPrivateKey', {
     expiresIn: '15m',
   });

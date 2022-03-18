@@ -20,6 +20,7 @@ export async function createUser(input: CreateUserInput) {
 
 export async function findUserById(id: string) {
   const user = await prisma.user.findUnique({ where: { id } });
+  
   return user;
 }
 

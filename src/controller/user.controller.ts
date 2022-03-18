@@ -14,6 +14,7 @@ import {
 import log from '../utils/logger';
 import sendEmail from '../utils/mailer';
 import prisma from '../utils/prisma';
+import argon2 from 'argon2';
 
 // ReqBody = CreateUserInput
 export async function createUserHandler(
@@ -24,7 +25,7 @@ export async function createUserHandler(
 
   try {
     const user = await createUser(body);
-    
+
     await sendEmail({
       // TODO make this your real address for prod
       from: 'test@example.com',
@@ -116,6 +117,7 @@ export async function resetPasswordHandler(
 ) {
   const { id, passwordResetCode } = req.params;
   const { password } = req.body;
+  const hash = await argon2.hash(password);
 
   const user = await findUserById(id);
 
@@ -130,7 +132,7 @@ export async function resetPasswordHandler(
   // we don't need to manually hash the password because we have a pre save hook on the model
   await prisma.user.update({
     where: { id },
-    data: { passwordResetCode: null, password },
+    data: { passwordResetCode: null, password: hash },
   });
 
   return res.send('Successfully updated password');
