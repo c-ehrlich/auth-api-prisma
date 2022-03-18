@@ -1,0 +1,2 @@
+* In Mongo, passwordResetCode was `string | null`. in Prisma I've made it optional instead. Need to see if that causes any problems.
+* ID is a string now because we're using UUID

@@ -2,4 +2,10 @@ yarn init
 npx tsc --init
 yarn add typescript ts-node-dev @types/express @types/config pino-pretty @types/nodemailer @types/lodash @types/jsonwebtoken -D
 yarn add express@5
-yarn add mongoose @typegoose/typegoose config argon2 pino dayjs nanoid nodemailer pino-pretty jsonwebtoken dotenv
+yarn add @prisma/client config argon2 pino dayjs nanoid nodemailer pino-pretty jsonwebtoken dotenv
+
+# initialize prisma
+npx prisma init --datasource-provider postgresql
+
+# migrate the schema
+npx prisma migrate dev --name init

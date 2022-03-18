@@ -1,6 +1,5 @@
 export default {
   port: 3000,
-  dbUri: 'mongodb://localhost:27017/crud-boilerplate-express-ts',
   logLevel: 'info',
   // defined in custom-environment-variables.ts
   accessTokenPrivateKey: '',

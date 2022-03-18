@@ -1,18 +1,27 @@
 import { DocumentType } from '@typegoose/typegoose';
-import SessionModel from '../model/session.model';
-import { privateFields, User } from '../model/user.model';
 import { signJwt } from '../utils/jwt';
 import { omit } from 'lodash';
+import prisma from '../utils/prisma';
+
+const privateFields = [
+  'password',
+  'verificationCode',
+  'passwordResetCode',
+  'verified',
+];
 
 export async function createSession({ userId }: { userId: string }) {
-  return SessionModel.create({ user: userId });
+  return prisma.session.create({ data: { userId, valid: true } });
 }
 
 export async function findSessionById(id: string) {
-  return SessionModel.findById(id);
+  const session = prisma.session.findUnique({ where: { id } });
+
+  return session;
 }
 
-export function signAccessToken(user: DocumentType<User>) {
+// FIXME-TS type of user was DocumentType<User>
+export function signAccessToken(user: any) {
   const payload = omit(user.toJSON(), privateFields);
   const accessToken = signJwt(payload, 'accessTokenPrivateKey', {
     expiresIn: '15m',
@@ -26,9 +35,9 @@ export async function signRefreshToken({ userId }: { userId: string }) {
     userId,
   });
 
-  // sign a refresh token
+  // sign a refresh token 
   const refreshToken = signJwt(
-    { session: session._id },
+    { session: session.id },
     'refreshTokenPrivateKey',
     {
       expiresIn: '1y',

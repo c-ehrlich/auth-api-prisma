@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { nanoid } from 'nanoid';
-import UserModel from '../model/user.model';
 import {
   CreateUserInput,
   ForgotPasswordInput,
@@ -14,6 +13,7 @@ import {
 } from '../service/user.service';
 import log from '../utils/logger';
 import sendEmail from '../utils/mailer';
+import prisma from '../utils/prisma';
 
 // ReqBody = CreateUserInput
 export async function createUserHandler(
@@ -24,13 +24,14 @@ export async function createUserHandler(
 
   try {
     const user = await createUser(body);
+    
     await sendEmail({
       // TODO make this your real address for prod
       from: 'test@example.com',
       to: user.email,
       subject: 'Please verify your account',
       text: `Verification code: ${user.verificationCode}
-      Id: ${user._id}`,
+      Id: ${user.id}`,
     });
     return res.send('User successfully created');
   } catch (e: any) {
@@ -63,8 +64,7 @@ export async function verifyUserHandler(
 
   // check to see if the verificaiton code matches
   if (user.verificationCode === v) {
-    user.verified = true;
-    await user.save();
+    await prisma.user.update({ where: { id }, data: { verified: true } });
     return res.send('User successfully verified');
   }
 
@@ -92,16 +92,17 @@ export async function forgotPasswordHandler(
 
   const passwordResetCode = nanoid();
 
-  user.passwordResetCode = passwordResetCode;
-
-  await user.save();
+  await prisma.user.update({
+    where: { email: email.toLocaleLowerCase() },
+    data: { passwordResetCode },
+  });
 
   await sendEmail({
     to: user.email,
     from: 'test@example.com', // TODO make a real email address
     subject: 'Reset your password',
     text: `Password reset code: ${passwordResetCode}
-    Id: ${user._id}`,
+    Id: ${user.id}`,
   });
 
   log.debug(`Password reset email sent to ${email}`);
@@ -126,12 +127,11 @@ export async function resetPasswordHandler(
     return res.status(400).send('Could not reset user password');
   }
 
-  user.passwordResetCode = null;
-
   // we don't need to manually hash the password because we have a pre save hook on the model
-  user.password = password;
-
-  await user.save();
+  await prisma.user.update({
+    where: { id },
+    data: { passwordResetCode: null, password },
+  });
 
   return res.send('Successfully updated password');
 }
