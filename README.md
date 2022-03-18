@@ -5,6 +5,8 @@ An authentication API with JWTs using Express, TypeScript, and Zod.
 
 This version uses MongoDB/Mongoose/TypeGoose for the database. I also built the same app but using Postgres/Prisma. You can find that [here](https://github.com/c-ehrlich/auth-api-mongoose).
 
+The MongoDB version is based on this video: [Tom Does Tech - Build an Authentication API with Node.js, TypeScript, Typegoose, ExpressJS & Zod](https://www.youtube.com/watch?v=qylGaki0JhY)
+
 ## What did I learn?
 The main point was to build a well structured boilerplate that I could base future projects on. I believe it was quite successful in that regard.
 
